@@ -1,5 +1,5 @@
 function getWebpackMajorVersion() {
-    // Determine major webpack version from package.json or webpack itself
+  // Determine major webpack version from package.json or webpack itself
   var rawWebpackVersion =
         require('webpack').version ||
         require('../../package.json').devDependencies.webpack;

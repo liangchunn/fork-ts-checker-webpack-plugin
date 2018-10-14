@@ -6,7 +6,7 @@ var webpack = require('webpack');
 var process = require('process');
 var ForkTsCheckerWebpackPlugin = require('../../lib/index');
 var IncrementalChecker = require('../../lib/IncrementalChecker')
-    .IncrementalChecker;
+  .IncrementalChecker;
 
 var webpackMajorVersion = require('./webpackVersion')();
 
@@ -23,66 +23,72 @@ describe('[INTEGRATION] vue', function() {
 
   function createCompiler(options) {
     plugin = new ForkTsCheckerWebpackPlugin(
-            Object.assign({}, options, { silent: true })
-        );
-
-    compiler = webpack({
-      ...(webpackMajorVersion >= 4 ? { mode: 'development' } : {}),
-      context: path.resolve(__dirname, './vue'),
-      entry: './src/index.ts',
-      output: {
-        path: path.resolve(__dirname, '../../tmp'),
-      },
-      resolve: {
-        extensions: ['.ts', '.js', '.vue', '.json'],
-        alias: {
-          '@': path.resolve(__dirname, './vue/src'),
-        },
-      },
-      module: {
-        rules: [
-          {
-            test: /\.vue$/,
-            loader: 'vue-loader',
+      Object.assign({}, options, { silent: true })
+    );
+    compiler = webpack(
+      Object.assign(
+        {},
+        webpackMajorVersion >= 4 ? { mode: 'development' } : {},
+        {
+          context: path.resolve(__dirname, './vue'),
+          entry: './src/index.ts',
+          output: {
+            path: path.resolve(__dirname, '../../tmp'),
           },
-          {
-            test: /\.ts$/,
-            loader: 'ts-loader',
-            options: {
-              appendTsSuffixTo: [/\.vue$/],
-              transpileOnly: true,
-              silent: true,
+          resolve: {
+            extensions: ['.ts', '.js', '.vue', '.json'],
+            alias: {
+              '@': path.resolve(__dirname, './vue/src'),
             },
           },
-          {
-            test: /\.css$/,
-            loader: 'css-loader',
+          module: {
+            rules: [
+              {
+                test: /\.vue$/,
+                loader: 'vue-loader',
+              },
+              {
+                test: /\.ts$/,
+                loader: 'ts-loader',
+                options: {
+                  appendTsSuffixTo: [/\.vue$/],
+                  transpileOnly: true,
+                  silent: true,
+                },
+              },
+              {
+                test: /\.css$/,
+                loader: 'css-loader',
+              },
+            ],
           },
-        ],
-      },
-      plugins: [
-        ...(webpackMajorVersion >= 4 ? [new VueLoaderPlugin()] : []),
-        plugin,
-      ],
-    });
+          plugins: [
+            ...(webpackMajorVersion >= 4
+              ? [new VueLoaderPlugin()]
+              : []),
+            plugin,
+          ],
+        }
+      )
+    );
 
     files = {
       'example.vue': path.resolve(compiler.context, 'src/example.vue'),
       'syntacticError.ts': path.resolve(
-                compiler.context,
-                'src/syntacticError.ts'
-            ),
+        compiler.context,
+        'src/syntacticError.ts'
+      ),
     };
 
     checker = new IncrementalChecker(
-            plugin.tsconfigPath,
-            plugin.tslintPath || false,
-            [compiler.context],
-            ForkTsCheckerWebpackPlugin.ONE_CPU,
-            1,
-            plugin.checkSyntacticErrors,
-            plugin.vue
-        );
+      plugin.tsconfigPath,
+      plugin.tslintPath || false,
+      [compiler.context],
+      ForkTsCheckerWebpackPlugin.ONE_CPU,
+      1,
+      plugin.checkSyntacticErrors,
+      plugin.vue
+    );
 
     checker.nextIteration();
   }
@@ -98,7 +104,7 @@ describe('[INTEGRATION] vue', function() {
 
     fileFound =
             checker.programConfig.fileNames.indexOf(
-                files['syntacticError.ts']
+              files['syntacticError.ts']
             ) >= 0;
     expect(fileFound).to.be.true;
   });
@@ -114,7 +120,7 @@ describe('[INTEGRATION] vue', function() {
 
     fileFound =
             checker.programConfig.fileNames.indexOf(
-                files['syntacticError.ts']
+              files['syntacticError.ts']
             ) >= 0;
     expect(fileFound).to.be.true;
   });
@@ -165,8 +171,8 @@ describe('[INTEGRATION] vue', function() {
     compiler.run(function(error, stats) {
       stats.compilation.warnings.forEach(function(warning) {
         expect(warning.rawMessage).to.not.match(
-                    /no-consecutive-blank-lines/
-                );
+          /no-consecutive-blank-lines/
+        );
       });
       callback();
     });
@@ -188,31 +194,31 @@ describe('[INTEGRATION] vue', function() {
       const errors = stats.compilation.errors;
       expect(errors.length).to.be.equal(1);
       expect(errors[0].file).to.match(
-                /test\/integration\/vue\/src\/attrs\/test.ts$/
-            );
+        /test\/integration\/vue\/src\/attrs\/test.ts$/
+      );
       callback();
     });
   })
-    ;[
-      'example-ts.vue',
-      'example-tsx.vue',
-      'example-js.vue',
-      'example-jsx.vue',
-      'example-nolang.vue',
-    ].forEach(fileName => {
-      it('should be able to extract script from ' + fileName, function() {
-        createCompiler({ vue: true, tsconfig: 'tsconfig-langs.json' });
-        var sourceFilePath = path.resolve(
-                compiler.context,
-                'src/langs/' + fileName
-            );
-        var source = checker.program.getSourceFile(sourceFilePath);
-        expect(source).to.not.be.undefined;
-            // remove padding lines
-        var text = source.text.replace(/^\s*\/\/.*$\r*\n/gm, '').trim();
-        expect(text.startsWith('/* OK */')).to.be.true;
-      });
+  ;[
+    'example-ts.vue',
+    'example-tsx.vue',
+    'example-js.vue',
+    'example-jsx.vue',
+    'example-nolang.vue',
+  ].forEach(fileName => {
+    it('should be able to extract script from ' + fileName, function() {
+      createCompiler({ vue: true, tsconfig: 'tsconfig-langs.json' });
+      var sourceFilePath = path.resolve(
+        compiler.context,
+        'src/langs/' + fileName
+      );
+      var source = checker.program.getSourceFile(sourceFilePath);
+      expect(source).to.not.be.undefined;
+      // remove padding lines
+      var text = source.text.replace(/^\s*\/\/.*$\r*\n/gm, '').trim();
+      expect(text.startsWith('/* OK */')).to.be.true;
     });
+  });
 
   function groupByFileName(errors) {
     var ret = {
@@ -257,7 +263,7 @@ describe('[INTEGRATION] vue', function() {
   describe('should be able to detect errors in *.vue', function() {
     var errors;
     before(function(callback) {
-            // tsconfig-langs-strict.json === tsconfig-langs.json + noUnusedLocals
+      // tsconfig-langs-strict.json === tsconfig-langs.json + noUnusedLocals
       createCompiler({
         vue: true,
         tsconfig: 'tsconfig-langs-strict.json',
@@ -270,14 +276,14 @@ describe('[INTEGRATION] vue', function() {
     it('lang=ts', function() {
       expect(errors['example-ts.vue'].length).to.be.equal(1);
       expect(errors['example-ts.vue'][0].rawMessage).to.match(
-                /'a' is declared but/
-            );
+        /'a' is declared but/
+      );
     });
     it('lang=tsx', function() {
       expect(errors['example-tsx.vue'].length).to.be.equal(1);
       expect(errors['example-tsx.vue'][0].rawMessage).to.match(
-                /'a' is declared but/
-            );
+        /'a' is declared but/
+      );
     });
     it('lang=js', function() {
       expect(errors['example-js.vue'].length).to.be.equal(0);
@@ -302,34 +308,34 @@ describe('[INTEGRATION] vue', function() {
 
     it('should be able to import by relative path', function() {
       expect(
-                errors.filter(
-                    e => e.rawMessage.indexOf('./Component1.vue') >= 0
-                ).length
-            ).to.be.equal(0);
+        errors.filter(
+          e => e.rawMessage.indexOf('./Component1.vue') >= 0
+        ).length
+      ).to.be.equal(0);
     });
     it('should be able to import by path from baseUrl', function() {
       expect(
-                errors.filter(
-                    e => e.rawMessage.indexOf('imports/Component2.vue') >= 0
-                ).length
-            ).to.be.equal(0);
+        errors.filter(
+          e => e.rawMessage.indexOf('imports/Component2.vue') >= 0
+        ).length
+      ).to.be.equal(0);
     });
     it('should be able to import by compilerOptions.paths setting', function() {
       expect(
-                errors.filter(
-                    e => e.rawMessage.indexOf('@/Component3.vue') >= 0
-                ).length
-            ).to.be.equal(0);
+        errors.filter(
+          e => e.rawMessage.indexOf('@/Component3.vue') >= 0
+        ).length
+      ).to.be.equal(0);
     });
     it('should be able to import by compilerOptions.paths setting (by array)', function() {
       expect(
-                errors.filter(e => e.rawMessage.indexOf('foo/Foo1.vue') >= 0)
-                    .length
-            ).to.be.equal(0);
+        errors.filter(e => e.rawMessage.indexOf('foo/Foo1.vue') >= 0)
+          .length
+      ).to.be.equal(0);
       expect(
-                errors.filter(e => e.rawMessage.indexOf('foo/Foo2.vue') >= 0)
-                    .length
-            ).to.be.equal(0);
+        errors.filter(e => e.rawMessage.indexOf('foo/Foo2.vue') >= 0)
+          .length
+      ).to.be.equal(0);
     });
     it('should not report any compilation errors', function() {
       expect(errors.length).to.be.equal(0);

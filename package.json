@@ -61,7 +61,7 @@
     "@types/webpack": "^4.4.9",
     "chai": "^3.5.0",
     "css-loader": "^0.28.7",
-    "eslint": "^3.19.0",
+    "eslint": "^5.7.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.1",
     "mock-fs": "^4.3.0",
