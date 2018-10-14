@@ -22,4 +22,4 @@ export function createDefaultFormatter() {
       codeColor(message.getFormattedCode() + ': ') + message.getContent()
     ].join(os.EOL);
   };
-}
+};

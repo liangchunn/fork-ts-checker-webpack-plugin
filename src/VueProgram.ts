@@ -183,11 +183,11 @@ export class VueProgram {
   }
 
   private static getScriptKindByLang(lang: string) {
-    if (lang === 'ts') {
+    if (lang === "ts") {
       return ts.ScriptKind.TS;
-    } else if (lang === 'tsx') {
+    } else if (lang === "tsx") {
       return ts.ScriptKind.TSX;
-    } else if (lang === 'jsx') {
+    } else if (lang === "jsx") {
       return ts.ScriptKind.JSX;
     } else {
       // when lang is "js" or no lang specified
