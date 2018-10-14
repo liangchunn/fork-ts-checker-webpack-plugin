@@ -263,7 +263,7 @@ class ForkTsCheckerWebpackPlugin {
     if ('hooks' in this.compiler) {
       // webpack 4+
       const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
-      this.compiler.hooks.compilation.tap(checkerPluginName, () => {
+      this.compiler.hooks.compile.tap(checkerPluginName, () => {
         this.compilationDone = false;
         hooks.forkTsCheckerServiceBeforeStart.callAsync(() => {
           if (this.cancellationToken) {
