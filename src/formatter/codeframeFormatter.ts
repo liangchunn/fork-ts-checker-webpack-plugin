@@ -37,4 +37,4 @@ export function createCodeframeFormatter(options: any) {
       (frame ? os.EOL + frame : '')
     );
   };
-};
+}

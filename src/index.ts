@@ -12,23 +12,9 @@ import { NormalizedMessage } from './NormalizedMessage';
 import { createDefaultFormatter } from './formatter/defaultFormatter';
 import { createCodeframeFormatter } from './formatter/codeframeFormatter';
 import { Message } from './Message';
-
-import { AsyncSeriesHook } from 'tapable';
-import { SyncHook } from 'tapable';
+import { getForkTsCheckerWebpackPluginHooks } from './hooks';
 
 const checkerPluginName = 'fork-ts-checker-webpack-plugin';
-
-const customHooks = {
-  forkTsCheckerServiceBeforeStart: 'fork-ts-checker-service-before-start',
-  forkTsCheckerCancel: 'fork-ts-checker-cancel',
-  forkTsCheckerServiceStartError: 'fork-ts-checker-service-start-error',
-  forkTsCheckerWaiting: 'fork-ts-checker-waiting',
-  forkTsCheckerServiceStart: 'fork-ts-checker-service-start',
-  forkTsCheckerReceive: 'fork-ts-checker-receive',
-  forkTsCheckerServiceOutOfMemory: 'fork-ts-checker-service-out-of-memory',
-  forkTsCheckerEmit: 'fork-ts-checker-emit',
-  forkTsCheckerDone: 'fork-ts-checker-done'
-};
 
 type Formatter = (message: NormalizedMessage, useColors: boolean) => string;
 
@@ -156,6 +142,10 @@ class ForkTsCheckerWebpackPlugin {
     this.vue = options.vue === true; // default false
   }
 
+  static getHooks(compiler: any) {
+    return getForkTsCheckerWebpackPluginHooks(compiler);
+  }
+
   static createFormatter(type: 'default' | 'codeframe', options: any) {
     switch (type) {
       case 'default':
@@ -186,9 +176,6 @@ class ForkTsCheckerWebpackPlugin {
     }
 
     if (tsconfigOk && tslintOk) {
-      if ('hooks' in compiler) {
-        this.registerCustomHooks();
-      }
       this.pluginStart();
       this.pluginStop();
       this.pluginCompile();
@@ -272,59 +259,38 @@ class ForkTsCheckerWebpackPlugin {
     });
   }
 
-  registerCustomHooks() {
-    if (this.compiler.hooks.forkTsCheckerServiceBeforeStart
-      || this.compiler.hooks.forkTsCheckerCancel
-      || this.compiler.hooks.forkTsCheckerServiceStartError
-      || this.compiler.hooks.forkTsCheckerWaiting
-      || this.compiler.hooks.forkTsCheckerServiceStart
-      || this.compiler.hooks.forkTsCheckerReceive
-      || this.compiler.hooks.forkTsCheckerServiceOutOfMemory
-      || this.compiler.hooks.forkTsCheckerDone
-      || this.compiler.hooks.forkTsCheckerEmit) {
-      throw new Error('fork-ts-checker-webpack-plugin hooks are already in use');
-    }
-    this.compiler.hooks.forkTsCheckerServiceBeforeStart = new AsyncSeriesHook([]);
-
-    this.compiler.hooks.forkTsCheckerCancel = new SyncHook(['cancellationToken']);
-    this.compiler.hooks.forkTsCheckerServiceStartError = new SyncHook(['error']);
-    this.compiler.hooks.forkTsCheckerWaiting = new SyncHook(['hasTsLint']);
-    this.compiler.hooks.forkTsCheckerServiceStart = new SyncHook(['tsconfigPath', 'tslintPath', 'watchPaths', 'workersNumber', 'memoryLimit']);
-    this.compiler.hooks.forkTsCheckerReceive = new SyncHook(['diagnostics', 'lints']);
-    this.compiler.hooks.forkTsCheckerServiceOutOfMemory = new SyncHook([]);
-    this.compiler.hooks.forkTsCheckerEmit = new SyncHook(['diagnostics', 'lints', 'elapsed']);
-    this.compiler.hooks.forkTsCheckerDone = new SyncHook(['diagnostics', 'lints', 'elapsed']);
-
-    // for backwards compatibility
-    this.compiler._pluginCompat.tap(checkerPluginName, (options: any) => {
-      switch (options.name) {
-        case customHooks.forkTsCheckerServiceBeforeStart:
-          options.async = true;
-          break;
-        case customHooks.forkTsCheckerCancel:
-        case customHooks.forkTsCheckerServiceStartError:
-        case customHooks.forkTsCheckerWaiting:
-        case customHooks.forkTsCheckerServiceStart:
-        case customHooks.forkTsCheckerReceive:
-        case customHooks.forkTsCheckerServiceOutOfMemory:
-        case customHooks.forkTsCheckerEmit:
-        case customHooks.forkTsCheckerDone:
-          return true;
-      }
-      return undefined;
-    });
-  }
+  // registerCustomHooks() {
+  //   // for backwards compatibility
+  //   this.compiler._pluginCompat.tap(checkerPluginName, (options: any) => {
+  //     switch (options.name) {
+  //       case customHooks.forkTsCheckerServiceBeforeStart:
+  //         options.async = true;
+  //         break;
+  //       case customHooks.forkTsCheckerCancel:
+  //       case customHooks.forkTsCheckerServiceStartError:
+  //       case customHooks.forkTsCheckerWaiting:
+  //       case customHooks.forkTsCheckerServiceStart:
+  //       case customHooks.forkTsCheckerReceive:
+  //       case customHooks.forkTsCheckerServiceOutOfMemory:
+  //       case customHooks.forkTsCheckerEmit:
+  //       case customHooks.forkTsCheckerDone:
+  //         return true;
+  //     }
+  //     return undefined;
+  //   });
+  // }
 
   pluginCompile() {
     if ('hooks' in this.compiler) {
+      const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
       // webpack 4
-      this.compiler.hooks.compile.tap(checkerPluginName, () => {
+      this.compiler.hooks.compilation.tap(checkerPluginName, () => {
         this.compilationDone = false;
-        this.compiler.hooks.forkTsCheckerServiceBeforeStart.callAsync(() => {
+        hooks.forkTsCheckerServiceBeforeStart.callAsync(() => {
           if (this.cancellationToken) {
             // request cancellation if there is not finished job
             this.cancellationToken.requestCancellation();
-            this.compiler.hooks.forkTsCheckerCancel.call(this.cancellationToken);
+            hooks.forkTsCheckerCancel.call(this.cancellationToken);
           }
           this.checkDone = false;
 
@@ -342,8 +308,7 @@ class ForkTsCheckerWebpackPlugin {
             if (!this.silent && this.logger) {
               this.logger.error(this.colors.red('Cannot start checker service: ' + (error ? error.toString() : 'Unknown error')));
             }
-
-            this.compiler.hooks.forkTsCheckerServiceStartError.call(error);
+            hooks.forkTsCheckerServiceStartError.call(error);
           }
         });
       });
@@ -408,6 +373,7 @@ class ForkTsCheckerWebpackPlugin {
 
   pluginDone() {
     if ('hooks' in this.compiler) {
+      const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
       // webpack 4
       this.compiler.hooks.done.tap(checkerPluginName, (_stats: webpack.Stats) => {
         if (!this.isWatching || !this.async) {
@@ -418,7 +384,7 @@ class ForkTsCheckerWebpackPlugin {
           this.doneCallback();
         } else {
           if (this.compiler) {
-            this.compiler.hooks.forkTsCheckerWaiting.call(this.tslint !== false);
+            hooks.forkTsCheckerWaiting.call(this.tslint !== false);
           }
           if (!this.silent && this.logger) {
             this.logger.info(
@@ -485,8 +451,9 @@ class ForkTsCheckerWebpackPlugin {
     );
 
     if ('hooks' in this.compiler) {
+      const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
       // webpack 4
-      this.compiler.hooks.forkTsCheckerServiceStart.call(
+      hooks.forkTsCheckerServiceStart.call(
         this.tsconfigPath,
         this.tslintPath,
         this.watchPaths,
@@ -569,8 +536,9 @@ class ForkTsCheckerWebpackPlugin {
     }
 
     if ('hooks' in this.compiler) {
+      const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
       // webpack 4
-      this.compiler.hooks.forkTsCheckerReceive.call(this.diagnostics, this.lints);
+      hooks.forkTsCheckerReceive.call(this.diagnostics, this.lints);
     } else {
       // webpack 2 / 3
       this.compiler.applyPlugins('fork-ts-checker-receive', this.diagnostics, this.lints);
@@ -586,8 +554,10 @@ class ForkTsCheckerWebpackPlugin {
       // probably out of memory :/
       if (this.compiler) {
         if ('hooks' in this.compiler) {
+          const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
+
           // webpack 4
-          this.compiler.hooks.forkTsCheckerServiceOutOfMemory.call();
+          hooks.forkTsCheckerServiceOutOfMemory.call();
         } else {
           // webpack 2 / 3
           this.compiler.applyPlugins('fork-ts-checker-service-out-of-memory');
@@ -609,8 +579,9 @@ class ForkTsCheckerWebpackPlugin {
       const elapsed = Math.round(this.elapsed[0] * 1E9 + this.elapsed[1]);
 
       if ('hooks' in this.compiler) {
+        const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
         // webpack 4
-        this.compiler.hooks.forkTsCheckerEmit.call(
+        hooks.forkTsCheckerEmit.call(
           this.diagnostics,
           this.lints,
           elapsed
@@ -662,8 +633,9 @@ class ForkTsCheckerWebpackPlugin {
 
       if (this.compiler) {
         if ('hooks' in this.compiler) {
+          const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
           // webpack 4
-          this.compiler.hooks.forkTsCheckerDone.call(
+          hooks.forkTsCheckerDone.call(
             this.diagnostics,
             this.lints,
             elapsed
@@ -703,6 +675,6 @@ class ForkTsCheckerWebpackPlugin {
   }
 }
 
-export = ForkTsCheckerWebpackPlugin
+export = ForkTsCheckerWebpackPlugin;
 
 namespace ForkTsCheckerWebpackPlugin {}

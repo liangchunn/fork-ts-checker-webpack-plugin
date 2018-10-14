@@ -14,8 +14,8 @@
     "test": "npm run build && npm run test:unit && npm run test:integration",
     "test:watch": "mocha -R spec --watch ./test/unit",
     "test:coverage": "rimraf coverage && istanbul cover -root lib --include-all-sources mocha -- -R spec ./test/unit ./test/integration",
-    "lint": "eslint ./lib ./test",
-    "lint:fix": "eslint ./lib ./test --fix"
+    "lint": "tslint --project src/tsconfig.json && eslint ./test",
+    "lint:fix": "tslint --project src/tsconfig.json --fix && eslint ./test --fix"
   },
   "repository": {
     "url": "https://github.com/Realytics/fork-ts-checker-webpack-plugin.git",
@@ -69,7 +69,7 @@
     "rimraf": "^2.5.4",
     "sinon": "^2.3.1",
     "ts-loader": "4.3.0",
-    "tslint": "^5.0.0",
+    "tslint": "^5.11.0",
     "typescript": "^3.0.1",
     "vue": "^2.5.16",
     "vue-class-component": "^6.1.1",

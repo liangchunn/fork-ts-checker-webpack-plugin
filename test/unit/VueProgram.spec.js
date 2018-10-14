@@ -26,7 +26,7 @@ describe('[UNIT] VueProgram', function () {
           'src/*'
         ]
       }
-    }
+    };
     var moduleNames = [
       './test.vue',
       '../test.vue',

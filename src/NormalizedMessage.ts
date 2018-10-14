@@ -57,9 +57,9 @@ export class NormalizedMessage {
       code: diagnostic.code,
       severity: DiagnosticCategory[diagnostic.category].toLowerCase() as Severity,
       content: flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
-      file: file,
-      line: line,
-      character: character
+      file,
+      line,
+      character
     });
   }
 

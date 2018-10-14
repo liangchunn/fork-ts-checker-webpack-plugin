@@ -243,7 +243,7 @@ export class IncrementalChecker {
             // check the error type due to file system lag
             !(e instanceof Error) &&
             !(e.constructor.name === 'FatalError') &&
-            !(e.message && e.message.trim().startsWith("Invalid source file"))
+            !(e.message && e.message.trim().startsWith('Invalid source file'))
         ) {
           // it's not because file doesn't exist - throw error
           throw e;

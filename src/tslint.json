@@ -8,12 +8,9 @@
         false
       ],
       "no-object-literal-type-assertion":false,
-      "no-unused-variable": [true, "check-parameters"],
       "no-var-requires": false,
       "no-string-literal": false,
-      "quotemark": [
-        "single"
-      ],
+      "quotemark": [true, "single"],
       "ordered-imports":false,
       "prefer-object-spread": false,
       "ban-types": false,
@@ -30,7 +27,8 @@
         "check-format",
         "allow-leading-underscore",
         "allow-pascal-case"
-      ]
+      ],
+      "no-namespace": false
     }
   }
   
