@@ -1,3 +1,4 @@
+import * as webpack from 'webpack';
 import { AsyncSeriesHook, SyncHook } from 'tapable';
 
 const compilerHookMap = new WeakMap();
@@ -34,7 +35,7 @@ function createForkTsCheckerWebpackPluginHooks(): Record<keyof typeof customHook
     };
 }
 
-export function getForkTsCheckerWebpackPluginHooks(compiler: any) {
+export function getForkTsCheckerWebpackPluginHooks(compiler: webpack.Compiler) {
     let hooks = compilerHookMap.get(compiler);
     if (hooks === undefined) {
         hooks = createForkTsCheckerWebpackPluginHooks();

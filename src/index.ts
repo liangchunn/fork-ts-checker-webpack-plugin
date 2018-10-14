@@ -142,7 +142,7 @@ class ForkTsCheckerWebpackPlugin {
     this.vue = options.vue === true; // default false
   }
 
-  static getHooks(compiler: any) {
+  static getHooks(compiler: webpack.Compiler) {
     return getForkTsCheckerWebpackPluginHooks(compiler);
   }
 
@@ -223,7 +223,7 @@ class ForkTsCheckerWebpackPlugin {
     };
 
     if ('hooks' in this.compiler) {
-      // webpack 4
+      // webpack 4+
       this.compiler.hooks.run.tapAsync(checkerPluginName, run);
       this.compiler.hooks.watchRun.tapAsync(checkerPluginName, watchRun);
     } else {
@@ -245,7 +245,7 @@ class ForkTsCheckerWebpackPlugin {
     };
 
     if ('hooks' in this.compiler) {
-      // webpack 4
+      // webpack 4+
       this.compiler.hooks.watchClose.tap(checkerPluginName, watchClose);
       this.compiler.hooks.done.tap(checkerPluginName, done);
       } else {
@@ -259,31 +259,10 @@ class ForkTsCheckerWebpackPlugin {
     });
   }
 
-  // registerCustomHooks() {
-  //   // for backwards compatibility
-  //   this.compiler._pluginCompat.tap(checkerPluginName, (options: any) => {
-  //     switch (options.name) {
-  //       case customHooks.forkTsCheckerServiceBeforeStart:
-  //         options.async = true;
-  //         break;
-  //       case customHooks.forkTsCheckerCancel:
-  //       case customHooks.forkTsCheckerServiceStartError:
-  //       case customHooks.forkTsCheckerWaiting:
-  //       case customHooks.forkTsCheckerServiceStart:
-  //       case customHooks.forkTsCheckerReceive:
-  //       case customHooks.forkTsCheckerServiceOutOfMemory:
-  //       case customHooks.forkTsCheckerEmit:
-  //       case customHooks.forkTsCheckerDone:
-  //         return true;
-  //     }
-  //     return undefined;
-  //   });
-  // }
-
   pluginCompile() {
     if ('hooks' in this.compiler) {
+      // webpack 4+
       const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
-      // webpack 4
       this.compiler.hooks.compilation.tap(checkerPluginName, () => {
         this.compilationDone = false;
         hooks.forkTsCheckerServiceBeforeStart.callAsync(() => {
@@ -363,7 +342,7 @@ class ForkTsCheckerWebpackPlugin {
     };
 
     if ('hooks' in this.compiler) {
-      // webpack 4
+      // webpack 4+
       this.compiler.hooks.emit.tapAsync(checkerPluginName, emit);
     } else {
       // webpack 2 / 3
@@ -373,8 +352,8 @@ class ForkTsCheckerWebpackPlugin {
 
   pluginDone() {
     if ('hooks' in this.compiler) {
+      // webpack 4+
       const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
-      // webpack 4
       this.compiler.hooks.done.tap(checkerPluginName, (_stats: webpack.Stats) => {
         if (!this.isWatching || !this.async) {
           return;
@@ -451,8 +430,8 @@ class ForkTsCheckerWebpackPlugin {
     );
 
     if ('hooks' in this.compiler) {
+      // webpack 4+
       const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
-      // webpack 4
       hooks.forkTsCheckerServiceStart.call(
         this.tsconfigPath,
         this.tslintPath,
@@ -536,8 +515,8 @@ class ForkTsCheckerWebpackPlugin {
     }
 
     if ('hooks' in this.compiler) {
+      // webpack 4+
       const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
-      // webpack 4
       hooks.forkTsCheckerReceive.call(this.diagnostics, this.lints);
     } else {
       // webpack 2 / 3
@@ -554,9 +533,8 @@ class ForkTsCheckerWebpackPlugin {
       // probably out of memory :/
       if (this.compiler) {
         if ('hooks' in this.compiler) {
+          // webpack 4+
           const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
-
-          // webpack 4
           hooks.forkTsCheckerServiceOutOfMemory.call();
         } else {
           // webpack 2 / 3
@@ -579,8 +557,8 @@ class ForkTsCheckerWebpackPlugin {
       const elapsed = Math.round(this.elapsed[0] * 1E9 + this.elapsed[1]);
 
       if ('hooks' in this.compiler) {
+        // webpack 4+
         const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
-        // webpack 4
         hooks.forkTsCheckerEmit.call(
           this.diagnostics,
           this.lints,
@@ -633,8 +611,8 @@ class ForkTsCheckerWebpackPlugin {
 
       if (this.compiler) {
         if ('hooks' in this.compiler) {
+          // webpack 4+
           const hooks = ForkTsCheckerWebpackPlugin.getHooks(this.compiler);
-          // webpack 4
           hooks.forkTsCheckerDone.call(
             this.diagnostics,
             this.lints,
