@@ -1,3 +1,30 @@
+## v0.5.2
+
+* [Fix erroneous error on diagnostics at 0 line; remove deprecated fs.existsSync](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/190) (#190)
+
+## v0.5.1
+
+* [Make the checker compile with TypeScript 3.2](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/189)
+
+## 0.5.0
+
+ * Removed unused dependency `resolve`.
+ * Replace `lodash` usage with native calls.
+ * ** Breaking Changes**:
+   * Removed all getters from `NormalizedMessage`, use direct property access instead.
+ * **Internal**:
+   * Test against ts-loader v5
+   * Enable all strict type checks
+   * Update dev dependencies
+
+## v0.4.15
+
+* [Add `tslintAutoFix` option to be passed on to tslint to auto format typescript files](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/174) (#174)
+
+## v0.4.14
+
+* [Add support for `reportFiles` option](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/179) (#179)
+
 ## v0.4.13
 
 * [Merge in `compilerOptions` prior to calling `parseJsonConfigFileContent`](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/176) (#176)

@@ -66,6 +66,9 @@ Allows overriding TypeScript options. Should be specified in the same format as 
 * **tslint** `string | true`: 
 Path to *tslint.json* file or `true`. If `true`, uses `path.resolve(compiler.options.context, './tslint.json')`. Default: `undefined`.
 
+* **tslintAutoFix** `boolean `:
+Passes on `--fix` flag while running `tslint` to auto fix linting errors. Default: false.
+
 * **watch** `string | string[]`: 
 Directories or files to watch by service. Not necessary but improves performance (reduces number of `fs.stat` calls).
 
@@ -78,6 +81,14 @@ List of typescript diagnostic codes to ignore.
 
 * **ignoreLints** `string[]`: 
 List of tslint rule names to ignore.
+
+* **reportFiles** `string[]`: 
+Only report errors on files matching these glob patterns. This can be useful when certain types definitions have errors that are not fatal to your application. Default: `[]`.
+
+```js
+  // in webpack.config.js
+  new ForkTsCheckerWebpackPlugin({ reportFiles: ['src/**/*.{ts,tsx}', '!src/skip.ts'] })
+```
 
 * **colors** `boolean`:
 If `false`, disables built-in colors in logger messages. Default: `true`.
