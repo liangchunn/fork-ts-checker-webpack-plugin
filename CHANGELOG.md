@@ -1,3 +1,15 @@
+## v0.4.13
+
+* [Merge in `compilerOptions` prior to calling `parseJsonConfigFileContent`](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/176) (#176)
+
+## v0.4.12
+
+* [Add `compilerOptions` option](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/173) (#173)
+
+## v0.4.11
+
+* [Fix os.cpus is not a function](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/172) (#172)
+
 ## v0.4.10
 
 * [Allow fork-ts-checker-webpack-plugin to be imported in .ts files using ESM import syntax](https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/163) (#163)

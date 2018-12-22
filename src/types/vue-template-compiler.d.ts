@@ -6,8 +6,8 @@ declare module 'vue-template-compiler' {
   import Vue, { VNode } from 'vue';
 
   /*
-  * Template compilation options / results
-  */
+   * Template compilation options / results
+   */
   interface CompilerOptions {
     modules?: ModuleOptions[];
     directives?: Record<string, DirectiveFunction>;
@@ -36,11 +36,14 @@ declare module 'vue-template-compiler' {
     staticKeys?: string[];
   }
 
-  type DirectiveFunction = (node: ASTElement, directiveMeta: ASTDirective) => void;
+  type DirectiveFunction = (
+    node: ASTElement,
+    directiveMeta: ASTDirective
+  ) => void;
 
   /*
-  * AST Types
-  */
+   * AST Types
+   */
 
   /**
    * - 0: FALSE - whole sub tree un-optimizable
@@ -49,7 +52,7 @@ declare module 'vue-template-compiler' {
    * - 3: CHILDREN - self un-optimizable but have fully optimizable children
    * - 4: PARTIAL - self un-optimizable with some un-optimizable children
    */
-  export type SSROptimizability = 0 | 1 | 2 | 3 | 4
+  export type SSROptimizability = 0 | 1 | 2 | 3 | 4;
 
   export interface ASTModifiers {
     [key: string]: boolean;
@@ -178,8 +181,8 @@ declare module 'vue-template-compiler' {
   }
 
   /*
-  * SFC parser related types
-  */
+   * SFC parser related types
+   */
   interface SFCParserOptions {
     pad?: true | 'line' | 'space';
   }
@@ -204,8 +207,8 @@ declare module 'vue-template-compiler' {
   }
 
   /*
-  * Exposed functions
-  */
+   * Exposed functions
+   */
   export function compile(
     template: string,
     options?: CompilerOptions
@@ -218,7 +221,9 @@ declare module 'vue-template-compiler' {
     options?: CompilerOptions
   ): CompiledResult;
 
-  export function ssrCompileToFunctions(template: string): CompiledResultFunctions;
+  export function ssrCompileToFunctions(
+    template: string
+  ): CompiledResultFunctions;
 
   export function parseComponent(
     file: string,

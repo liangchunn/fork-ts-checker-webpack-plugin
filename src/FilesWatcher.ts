@@ -1,6 +1,6 @@
 import * as chokidar from 'chokidar';
 import * as path from 'path';
-import startsWith = require('lodash.startswith');
+import startsWith = require('lodash/startsWith');
 
 export class FilesWatcher {
   watchPaths: string[];
@@ -24,10 +24,8 @@ export class FilesWatcher {
     }
 
     this.watchers = this.watchPaths.map((watchPath: string) => {
-      return chokidar.watch(
-        watchPath,
-        { persistent: true, alwaysStat: true }
-      )
+      return chokidar
+        .watch(watchPath, { persistent: true, alwaysStat: true })
         .on('change', (filePath: string, stats: any) => {
           if (this.isFileSupported(filePath)) {
             (this.listeners['change'] || []).forEach(changeListener => {
@@ -67,7 +65,9 @@ export class FilesWatcher {
 
   off(event: string, listener: Function) {
     if (this.listeners[event]) {
-      this.listeners[event] = this.listeners[event].filter(oldListener => oldListener !== listener);
+      this.listeners[event] = this.listeners[event].filter(
+        oldListener => oldListener !== listener
+      );
     }
   }
 }
